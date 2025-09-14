@@ -1,8 +1,45 @@
 """
 ConsentRight Phase 1 - Main Application
 
-Terminal-based medical consultation prototype using LangChain and Google Gemini API.
-This application helps users get specialist recommendations based on symptom descriptions.
+Terminal-based medical consultation prototype demonstrating LangChain integration
+with Google Gemini API for educational purposes.
+
+EDUCATIONAL NOTES:
+==================
+
+This application demonstrates several important software development concepts:
+
+1. **User Interface Design**:
+   - Clear, intuitive terminal interface
+   - Comprehensive input validation
+   - User-friendly error messages
+   - Graceful error handling and recovery
+
+2. **LangChain Integration**:
+   - Proper LLM initialization and configuration
+   - Structured prompt templates for consistency
+   - Chain execution with error handling
+   - Response parsing and validation
+
+3. **Production-Ready Practices**:
+   - Environment variable configuration
+   - Comprehensive error categorization
+   - Retry logic with exponential backoff
+   - Logging and debugging support
+   - Input sanitization and validation
+
+4. **User Experience (UX)**:
+   - Progressive help and guidance
+   - Clear feedback during processing
+   - Consistent formatting and messaging
+   - Accessibility considerations
+
+Key Learning Objectives:
+- How to integrate LLMs into applications
+- Best practices for error handling
+- User interface design principles
+- Configuration management
+- Input validation techniques
 """
 
 import os
@@ -461,9 +498,11 @@ def main() -> None:
             print("\nFor API key setup instructions, see README.md")
             sys.exit(1)
         
-        # Initialize the LLM handler
+        # EDUCATIONAL: Initialize the LLM handler
+        # This demonstrates proper LangChain initialization with error handling
         print("🔄 Initializing AI consultation system...")
         try:
+            # Create our ConsultationLLM instance - this sets up the LangChain components
             consultation_llm = ConsultationLLM(api_key)
             print("✅ System ready!")
         except Exception as e:
@@ -487,15 +526,18 @@ def main() -> None:
                 # Show enhanced processing indicator with progress
                 _show_processing_indicator()
                 
-                # Process symptoms through LLM with timeout handling
+                # EDUCATIONAL: Process symptoms through LLM with comprehensive error handling
+                # This shows how to integrate LangChain processing into a user application
                 try:
+                    # Call our LangChain-based processing method
+                    # This executes: input validation → prompt formatting → LLM call → response parsing
                     result = consultation_llm.process_symptoms(symptoms)
                     
-                    # Reset error count on successful processing
+                    # Reset error count on successful processing (for progressive help)
                     if hasattr(main, '_error_count'):
                         main._error_count = 0
                     
-                    # Display the results
+                    # Display the structured results to the user
                     display_result(result)
                     
                 except KeyboardInterrupt:

@@ -1,8 +1,31 @@
 """
 ConsentRight Phase 1 - LLM Handler
 
-This module handles LangChain integration with Google Gemini API for medical consultation.
+This module demonstrates LangChain integration with Google Gemini API for medical consultation.
 It provides the ConsultationLLM class that processes symptoms and returns specialist recommendations.
+
+EDUCATIONAL NOTES:
+==================
+
+LangChain Concepts Demonstrated:
+1. **LLM Integration**: Using GoogleGenerativeAI to connect to Gemini API
+2. **Prompt Templates**: Structured prompts with variables for consistent input formatting
+3. **LLMChain**: Orchestrating the flow from prompt → LLM → response
+4. **Error Handling**: Robust retry logic and graceful degradation
+5. **Response Parsing**: Converting unstructured LLM output to structured data
+
+Key LangChain Components Used:
+- GoogleGenerativeAI: The LLM wrapper for Google's Gemini model
+- PromptTemplate: Template system for consistent prompt formatting
+- LLMChain: Chain that combines prompt template with LLM execution
+- Schema: For type definitions and response handling
+
+This educational implementation shows how to:
+- Initialize LLM connections securely
+- Create reusable prompt templates
+- Handle API errors gracefully
+- Parse and validate LLM responses
+- Implement retry logic for production use
 """
 
 import os
@@ -32,6 +55,24 @@ class ConsultationLLM:
         """
         Initialize the ConsultationLLM with Google Gemini API configuration.
         
+        EDUCATIONAL NOTE - LangChain LLM Initialization:
+        ===============================================
+        
+        This method demonstrates how to properly initialize a LangChain LLM wrapper:
+        
+        1. **GoogleGenerativeAI**: This is LangChain's wrapper for Google's Gemini API
+           - Handles authentication, request formatting, and response parsing
+           - Provides a consistent interface regardless of the underlying API
+        
+        2. **Model Configuration**:
+           - model="gemini-pro": Specifies which Gemini model to use
+           - temperature=0.3: Lower values (0-1) make responses more deterministic
+           - max_output_tokens=1024: Limits response length to control costs
+        
+        3. **LLMChain Creation**: Combines the LLM with a prompt template
+           - This is the core LangChain pattern: Template + LLM + Chain
+           - Enables reusable, structured interactions with the LLM
+        
         Args:
             api_key (str): Google Gemini API key for authentication
             
@@ -43,15 +84,18 @@ class ConsultationLLM:
             raise ValueError("Invalid API key provided. Please check your GEMINI_API_KEY environment variable.")
         
         try:
-            # Initialize Google Generative AI model through LangChain
+            # EDUCATIONAL: Initialize Google Generative AI model through LangChain
+            # This creates a LangChain wrapper around Google's Gemini API
             self.llm = GoogleGenerativeAI(
-                google_api_key=api_key,
-                model="gemini-pro",
-                temperature=0.3,  # Lower temperature for more consistent medical recommendations
-                max_output_tokens=1024
+                google_api_key=api_key,           # API authentication
+                model="gemini-pro",               # Specific Gemini model version
+                temperature=0.3,                  # Lower = more consistent, Higher = more creative
+                max_output_tokens=1024            # Limit response length for cost control
             )
             
-            # Create the LLMChain with our consultation prompt
+            # EDUCATIONAL: Create the LLMChain - this is the core LangChain pattern
+            # LLMChain = PromptTemplate + LLM + execution logic
+            # This allows us to reuse the same prompt structure with different inputs
             self.chain = self._create_chain()
             
             logger.info("ConsultationLLM initialized successfully with Gemini API")
@@ -64,15 +108,37 @@ class ConsultationLLM:
         """
         Create and configure the LLMChain with the consultation prompt template.
         
+        EDUCATIONAL NOTE - LangChain Chain Creation:
+        ===========================================
+        
+        This method demonstrates the LLMChain pattern, which is fundamental to LangChain:
+        
+        1. **LLMChain Components**:
+           - llm: The language model (our GoogleGenerativeAI instance)
+           - prompt: A PromptTemplate that formats input consistently
+           - verbose: Controls logging (useful for debugging)
+        
+        2. **Why Use Chains?**:
+           - Reusability: Same prompt structure for different inputs
+           - Consistency: Standardized input/output formatting
+           - Maintainability: Easy to modify prompts without changing code
+           - Composability: Chains can be combined for complex workflows
+        
+        3. **Alternative Approaches**:
+           - Direct LLM calls: Less structured, harder to maintain
+           - Custom chains: For more complex multi-step processes
+           - Sequential chains: For multi-stage processing
+        
         Returns:
             LLMChain: Configured chain for symptom processing
         """
         try:
-            # Create LLMChain with our prompt template and LLM
+            # EDUCATIONAL: Create LLMChain - the core LangChain abstraction
+            # This combines our LLM with our prompt template into a reusable unit
             chain = LLMChain(
-                llm=self.llm,
-                prompt=CONSULTATION_PROMPT,
-                verbose=False  # Set to True for debugging
+                llm=self.llm,                    # The language model to use
+                prompt=CONSULTATION_PROMPT,      # Our structured prompt template
+                verbose=False                    # Set to True to see prompt/response details
             )
             
             logger.info("LLMChain created successfully")
@@ -102,10 +168,15 @@ class ConsultationLLM:
         try:
             logger.info(f"Processing symptoms: {cleaned_symptoms[:50]}...")
             
-            # Execute the LLMChain with retry logic and user feedback
+            # EDUCATIONAL: Execute the LLMChain with retry logic
+            # The .run() method is LangChain's way to execute a chain with input variables
             def _execute_chain():
+                # This passes our symptoms to the prompt template's {symptoms} variable
+                # LangChain handles: prompt formatting → API call → response extraction
                 return self.chain.run(symptoms=cleaned_symptoms)
             
+            # EDUCATIONAL: Implement retry logic for production robustness
+            # API calls can fail due to network issues, rate limits, etc.
             response = self._retry_with_backoff(_execute_chain, max_retries=3, base_delay=1.0)
             
             # Parse and validate the response

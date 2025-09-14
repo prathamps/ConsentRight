@@ -1,8 +1,34 @@
 """
 Prompt templates and configuration for ConsentRight medical consultation system.
 
-This module contains structured prompt templates for LangChain integration,
-specialist definitions, and output formatting templates for consistent LLM responses.
+This module demonstrates LangChain prompt engineering best practices including:
+- Structured prompt templates with variables
+- Few-shot learning examples
+- Output format specification
+- Consistent data definitions
+
+EDUCATIONAL NOTES:
+==================
+
+Prompt Engineering Concepts Demonstrated:
+1. **PromptTemplate**: LangChain's template system for consistent prompts
+2. **Few-Shot Learning**: Providing examples to guide LLM behavior
+3. **Output Formatting**: Specifying exact response structure (JSON)
+4. **Context Setting**: Clear role definition and constraints
+5. **Variable Substitution**: Using {variable} placeholders for dynamic content
+
+Key Prompt Engineering Principles:
+- **Clarity**: Clear instructions and expectations
+- **Consistency**: Standardized format for all interactions
+- **Examples**: Show the LLM exactly what you want
+- **Constraints**: Define boundaries and available options
+- **Structure**: Organized, logical flow of information
+
+This approach ensures:
+- Predictable LLM responses
+- Easy parsing and validation
+- Consistent user experience
+- Maintainable prompt modifications
 """
 
 from langchain.prompts import PromptTemplate
@@ -35,9 +61,14 @@ Please respond in the following JSON format:
 }
 """
 
-# Main consultation prompt template with few-shot examples
+# EDUCATIONAL: Main consultation prompt template demonstrating LangChain best practices
 CONSULTATION_PROMPT = PromptTemplate(
+    # EDUCATIONAL: input_variables defines what placeholders can be used in the template
+    # LangChain will validate that all variables are provided when the template is used
     input_variables=["symptoms"],
+    
+    # EDUCATIONAL: The template string uses {variable} syntax for substitution
+    # This creates a reusable template that can be filled with different symptom descriptions
     template="""You are a medical consultation AI assistant that helps users identify which medical specialist they should consult based on their symptoms. 
 
 Available specialists: {specialist_list}
@@ -45,6 +76,12 @@ Available specialists: {specialist_list}
 Your task is to analyze the provided symptoms and recommend the most appropriate specialist, along with reasoning and urgency level.
 
 {output_format}
+
+EDUCATIONAL NOTE - Few-Shot Learning:
+===================================
+The examples below demonstrate "few-shot learning" - a prompt engineering technique where
+you provide examples of the desired input/output format to guide the LLM's responses.
+This is more effective than just describing what you want.
 
 Here are some examples of good responses:
 
