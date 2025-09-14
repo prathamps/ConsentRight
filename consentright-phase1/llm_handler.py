@@ -1,31 +1,8 @@
 """
 ConsentRight Phase 1 - LLM Handler
 
-This module demonstrates LangChain integration with Google Gemini API for medical consultation.
-It provides the ConsultationLLM class that processes symptoms and returns specialist recommendations.
-
-EDUCATIONAL NOTES:
-==================
-
-LangChain Concepts Demonstrated:
-1. **LLM Integration**: Using GoogleGenerativeAI to connect to Gemini API
-2. **Prompt Templates**: Structured prompts with variables for consistent input formatting
-3. **LLMChain**: Orchestrating the flow from prompt → LLM → response
-4. **Error Handling**: Robust retry logic and graceful degradation
-5. **Response Parsing**: Converting unstructured LLM output to structured data
-
-Key LangChain Components Used:
-- GoogleGenerativeAI: The LLM wrapper for Google's Gemini model
-- PromptTemplate: Template system for consistent prompt formatting
-- LLMChain: Chain that combines prompt template with LLM execution
-- Schema: For type definitions and response handling
-
-This educational implementation shows how to:
-- Initialize LLM connections securely
-- Create reusable prompt templates
-- Handle API errors gracefully
-- Parse and validate LLM responses
-- Implement retry logic for production use
+LangChain integration with Google Generative AI for medical consultation recommendations.
+Uses Gemini 2.5 Flash model for optimal performance and accuracy.
 """
 
 import os
@@ -33,10 +10,9 @@ import time
 import json
 import logging
 from typing import Dict, Any, Optional
-from langchain.llms import GoogleGenerativeAI
-from langchain.chains import LLMChain
-from langchain.schema import LLMResult
-from prompts import CONSULTATION_PROMPT
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.prompts import PromptTemplate
+from prompts import SPECIALIST_LIST, CONSULTATION_PROMPT
 
 # Configure logging for error tracking
 logging.basicConfig(level=logging.INFO)
@@ -53,25 +29,7 @@ class ConsultationLLM:
     
     def __init__(self, api_key: str):
         """
-        Initialize the ConsultationLLM with Google Gemini API configuration.
-        
-        EDUCATIONAL NOTE - LangChain LLM Initialization:
-        ===============================================
-        
-        This method demonstrates how to properly initialize a LangChain LLM wrapper:
-        
-        1. **GoogleGenerativeAI**: This is LangChain's wrapper for Google's Gemini API
-           - Handles authentication, request formatting, and response parsing
-           - Provides a consistent interface regardless of the underlying API
-        
-        2. **Model Configuration**:
-           - model="gemini-pro": Specifies which Gemini model to use
-           - temperature=0.3: Lower values (0-1) make responses more deterministic
-           - max_output_tokens=1024: Limits response length to control costs
-        
-        3. **LLMChain Creation**: Combines the LLM with a prompt template
-           - This is the core LangChain pattern: Template + LLM + Chain
-           - Enables reusable, structured interactions with the LLM
+        Initialize the ConsultationLLM with LangChain and Google Gemini API.
         
         Args:
             api_key (str): Google Gemini API key for authentication
@@ -84,69 +42,44 @@ class ConsultationLLM:
             raise ValueError("Invalid API key provided. Please check your GEMINI_API_KEY environment variable.")
         
         try:
-            # EDUCATIONAL: Initialize Google Generative AI model through LangChain
-            # This creates a LangChain wrapper around Google's Gemini API
-            self.llm = GoogleGenerativeAI(
-                google_api_key=api_key,           # API authentication
-                model="gemini-pro",               # Specific Gemini model version
-                temperature=0.3,                  # Lower = more consistent, Higher = more creative
-                max_output_tokens=1024            # Limit response length for cost control
-            )
+            # Initialize LangChain LLM with Gemini 2.5 Flash
+            # Try different model names in case 2.5 flash isn't available
+            try:
+                self.llm = ChatGoogleGenerativeAI(
+                    google_api_key=api_key,
+                    model="gemini-2.5-flash",
+                    temperature=0.3,
+                    max_output_tokens=2048
+                )
+                logger.info("Using Gemini 2.5 Flash model")
+            except Exception as e:
+                logger.warning(f"Gemini 2.5 Flash not available: {e}")
+                try:
+                    self.llm = ChatGoogleGenerativeAI(
+                        google_api_key=api_key,
+                        model="gemini-1.5-flash",
+                        temperature=0.3,
+                        max_output_tokens=2048
+                    )
+                    logger.info("Fallback to Gemini 1.5 Flash model")
+                except Exception as e2:
+                    logger.warning(f"Gemini 1.5 Flash not available: {e2}")
+                    self.llm = ChatGoogleGenerativeAI(
+                        google_api_key=api_key,
+                        model="gemini-pro",
+                        temperature=0.3,
+                        max_output_tokens=2048
+                    )
+                    logger.info("Fallback to Gemini Pro model")
             
-            # EDUCATIONAL: Create the LLMChain - this is the core LangChain pattern
-            # LLMChain = PromptTemplate + LLM + execution logic
-            # This allows us to reuse the same prompt structure with different inputs
-            self.chain = self._create_chain()
+            # Create modern LangChain runnable sequence
+            self.chain = CONSULTATION_PROMPT | self.llm
             
-            logger.info("ConsultationLLM initialized successfully with Gemini API")
+            logger.info("ConsultationLLM initialized successfully with LangChain and Gemini 2.5 Flash")
             
         except Exception as e:
             logger.error(f"Failed to initialize ConsultationLLM: {str(e)}")
             raise Exception(f"LangChain initialization failed: {str(e)}")
-    
-    def _create_chain(self) -> LLMChain:
-        """
-        Create and configure the LLMChain with the consultation prompt template.
-        
-        EDUCATIONAL NOTE - LangChain Chain Creation:
-        ===========================================
-        
-        This method demonstrates the LLMChain pattern, which is fundamental to LangChain:
-        
-        1. **LLMChain Components**:
-           - llm: The language model (our GoogleGenerativeAI instance)
-           - prompt: A PromptTemplate that formats input consistently
-           - verbose: Controls logging (useful for debugging)
-        
-        2. **Why Use Chains?**:
-           - Reusability: Same prompt structure for different inputs
-           - Consistency: Standardized input/output formatting
-           - Maintainability: Easy to modify prompts without changing code
-           - Composability: Chains can be combined for complex workflows
-        
-        3. **Alternative Approaches**:
-           - Direct LLM calls: Less structured, harder to maintain
-           - Custom chains: For more complex multi-step processes
-           - Sequential chains: For multi-stage processing
-        
-        Returns:
-            LLMChain: Configured chain for symptom processing
-        """
-        try:
-            # EDUCATIONAL: Create LLMChain - the core LangChain abstraction
-            # This combines our LLM with our prompt template into a reusable unit
-            chain = LLMChain(
-                llm=self.llm,                    # The language model to use
-                prompt=CONSULTATION_PROMPT,      # Our structured prompt template
-                verbose=False                    # Set to True to see prompt/response details
-            )
-            
-            logger.info("LLMChain created successfully")
-            return chain
-            
-        except Exception as e:
-            logger.error(f"Failed to create LLMChain: {str(e)}")
-            raise Exception(f"Chain creation failed: {str(e)}")
     
     def process_symptoms(self, symptoms: str) -> Dict[str, Any]:
         """
@@ -168,15 +101,12 @@ class ConsultationLLM:
         try:
             logger.info(f"Processing symptoms: {cleaned_symptoms[:50]}...")
             
-            # EDUCATIONAL: Execute the LLMChain with retry logic
-            # The .run() method is LangChain's way to execute a chain with input variables
+            # Execute LangChain with retry logic
             def _execute_chain():
-                # This passes our symptoms to the prompt template's {symptoms} variable
-                # LangChain handles: prompt formatting → API call → response extraction
-                return self.chain.run(symptoms=cleaned_symptoms)
+                result = self.chain.invoke({"symptoms": cleaned_symptoms})
+                return result.content if hasattr(result, 'content') else str(result)
             
-            # EDUCATIONAL: Implement retry logic for production robustness
-            # API calls can fail due to network issues, rate limits, etc.
+            # Implement retry logic for production robustness
             response = self._retry_with_backoff(_execute_chain, max_retries=3, base_delay=1.0)
             
             # Parse and validate the response
@@ -209,6 +139,8 @@ class ConsultationLLM:
             except Exception as fallback_error:
                 logger.error(f"Fallback recommendation also failed: {str(fallback_error)}")
                 raise Exception(f"Unable to process symptoms due to technical issues: {str(e)}")
+    
+
     
     def _validate_and_sanitize_input(self, symptoms: str) -> str:
         """
@@ -299,7 +231,6 @@ class ConsultationLLM:
                     raise ValueError(f"Missing or empty required field: {field}")
             
             # Validate specialist is from our predefined list
-            from prompts import SPECIALIST_LIST
             if parsed_data['specialist'] not in SPECIALIST_LIST:
                 logger.warning(f"Unexpected specialist: {parsed_data['specialist']}")
                 # Don't fail, but log the warning

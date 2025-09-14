@@ -1,11 +1,11 @@
 # ConsentRight Phase 1 - Medical Consultation Prototype
 
-A simple terminal-based medical consultation application built with LangChain and Google Gemini API. This educational project demonstrates LLM integration for providing AI-powered medical specialist recommendations based on symptom descriptions.
+A terminal-based medical consultation application built with LangChain and Google Gemini API. This educational project demonstrates LLM integration for providing AI-powered medical specialist recommendations based on symptom descriptions.
 
 ## Features
 
 - Terminal-based user interface for symptom input
-- AI-powered specialist recommendations using Google Gemini
+- AI-powered specialist recommendations using Google Gemini 2.5 Flash
 - LangChain integration for prompt engineering and LLM orchestration
 - Robust error handling and retry logic
 - Continuous consultation sessions
@@ -74,8 +74,8 @@ python main.py
 
 ### Basic Consultation Flow
 
-```bash
-🏥 Welcome to ConsentRight - Medical Consultation Assistant
+```text
+Welcome to ConsentRight - Medical Consultation Assistant
 ============================================================
 
 This AI-powered tool helps you identify which medical specialist
@@ -94,32 +94,29 @@ How to use:
 
 Please describe your symptoms:
 (Be as detailed as possible for better recommendations)
-💡 Tip: Include when symptoms started, severity, and any triggers
 
 > I have been experiencing severe chest pain and shortness of breath for the past 2 hours
 
-🔄 Processing your symptoms...
+Processing your symptoms...
    Analyzing symptoms and consulting medical knowledge base...
-   ✅ Analysis in progress...
-   📊 Generating specialist recommendation...
 
 ============================================================
-📋 CONSULTATION RESULT
+CONSULTATION RESULT
 ============================================================
 
-🏥 RECOMMENDED SPECIALIST: Cardiologist
-🚨 URGENCY LEVEL: High
+RECOMMENDED SPECIALIST: Cardiologist
+URGENCY LEVEL: High
 
-📝 REASONING:
+REASONING:
    Chest pain combined with shortness of breath are classic cardiovascular symptoms that require immediate cardiac evaluation to rule out heart conditions such as heart attack or other serious cardiac events.
 
-🔄 ALTERNATIVE SPECIALIST: Emergency Medicine
+ALTERNATIVE SPECIALIST: Emergency Medicine
 
-💡 ADDITIONAL NOTES:
+ADDITIONAL NOTES:
    Given the severity and combination of symptoms, consider seeking immediate emergency care if symptoms worsen or if you experience additional symptoms like sweating, nausea, or arm pain.
 
 ------------------------------------------------------------
-⚠️  IMPORTANT DISCLAIMER:
+IMPORTANT DISCLAIMER:
    This recommendation is AI-generated and should not replace
    professional medical advice. Please consult with a healthcare
    professional for proper diagnosis and treatment.
@@ -130,59 +127,56 @@ Would you like another consultation? (y/n): y
 
 ### Dermatology Consultation Example
 
-```bash
+```text
 Please describe your symptoms:
-(Be as detailed as possible for better recommendations)
-💡 Tip: Include when symptoms started, severity, and any triggers
 
 > I have an itchy red rash on my arms and legs that appeared 2 weeks ago and seems to be spreading
 
-🔄 Processing your symptoms...
+Processing your symptoms...
 
 ============================================================
-📋 CONSULTATION RESULT
+CONSULTATION RESULT
 ============================================================
 
-🏥 RECOMMENDED SPECIALIST: Dermatologist
-⚠️ URGENCY LEVEL: Medium
+RECOMMENDED SPECIALIST: Dermatologist
+URGENCY LEVEL: Medium
 
-📝 REASONING:
+REASONING:
    A persistent, spreading rash with itching that has lasted two weeks indicates a dermatological condition that requires specialized skin examination to determine the cause and appropriate treatment.
 
-🔄 ALTERNATIVE SPECIALIST: General Physician
+ALTERNATIVE SPECIALIST: General Physician
 
-💡 ADDITIONAL NOTES:
+ADDITIONAL NOTES:
    Avoid scratching the affected areas to prevent secondary infection. Consider using fragrance-free moisturizers and avoiding potential allergens until you can see a specialist.
 
 Would you like another consultation? (y/n): n
 
-👋 Thank you for using ConsentRight!
+Thank you for using ConsentRight!
 Remember: Always consult healthcare professionals for medical concerns.
-Stay healthy! 🌟
 ```
 
 ### Mental Health Consultation Example
 
-```bash
+```text
 Please describe your symptoms:
 
 > I've been feeling extremely sad and hopeless for weeks, lost interest in activities I used to enjoy, and having trouble sleeping
 
-🔄 Processing your symptoms...
+Processing your symptoms...
 
 ============================================================
-📋 CONSULTATION RESULT
+CONSULTATION RESULT
 ============================================================
 
-🏥 RECOMMENDED SPECIALIST: Psychiatrist
-⚠️ URGENCY LEVEL: Medium
+RECOMMENDED SPECIALIST: Psychiatrist
+URGENCY LEVEL: Medium
 
-📝 REASONING:
+REASONING:
    Persistent feelings of sadness, hopelessness, loss of interest in activities, and sleep disturbances are classic symptoms of depression that require professional mental health evaluation and treatment.
 
-🔄 ALTERNATIVE SPECIALIST: General Physician
+ALTERNATIVE SPECIALIST: General Physician
 
-💡 ADDITIONAL NOTES:
+ADDITIONAL NOTES:
    Mental health is just as important as physical health. Consider reaching out to trusted friends or family for support, and don't hesitate to seek professional help. If you have thoughts of self-harm, please contact a crisis helpline immediately.
 
 Would you like another consultation? (y/n): n
@@ -190,26 +184,26 @@ Would you like another consultation? (y/n): n
 
 ### Emergency Scenario Example
 
-```bash
+```text
 Please describe your symptoms:
 
 > I was in a car accident an hour ago, I have a severe headache, nausea, and feel confused
 
-🔄 Processing your symptoms...
+Processing your symptoms...
 
 ============================================================
-📋 CONSULTATION RESULT
+CONSULTATION RESULT
 ============================================================
 
-🏥 RECOMMENDED SPECIALIST: Emergency Medicine
-🚨 URGENCY LEVEL: High
+RECOMMENDED SPECIALIST: Emergency Medicine
+URGENCY LEVEL: High
 
-📝 REASONING:
+REASONING:
    Head trauma from a car accident combined with headache, nausea, and confusion are serious symptoms that could indicate traumatic brain injury or concussion requiring immediate emergency medical evaluation.
 
-🔄 ALTERNATIVE SPECIALIST: Neurologist
+ALTERNATIVE SPECIALIST: Neurologist
 
-💡 ADDITIONAL NOTES:
+ADDITIONAL NOTES:
    These symptoms following head trauma require immediate medical attention. Do not drive yourself to the hospital. Call emergency services or have someone drive you to the nearest emergency room immediately.
 
 Would you like another consultation? (y/n): n

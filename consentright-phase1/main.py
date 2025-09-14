@@ -59,7 +59,7 @@ def display_welcome() -> None:
     what users can expect from the consultation process.
     """
     print("\n" + "="*60)
-    print("🏥 Welcome to ConsentRight - Medical Consultation Assistant")
+    print("Welcome to ConsentRight - Medical Consultation Assistant")
     print("="*60)
     print("\nThis AI-powered tool helps you identify which medical specialist")
     print("to consult based on your symptoms. Please note:")
@@ -91,7 +91,7 @@ def get_user_input() -> str:
         try:
             print("\nPlease describe your symptoms:")
             print("(Be as detailed as possible for better recommendations)")
-            print("💡 Tip: Include when symptoms started, severity, and any triggers")
+            print("Tip: Include when symptoms started, severity, and any triggers")
             
             # Get user input
             user_input = input("\n> ").strip()
@@ -116,24 +116,24 @@ def get_user_input() -> str:
                 
                 # Provide helpful suggestions based on error type
                 if validation_result["error_type"] == "empty":
-                    print("   💡 Please describe what you're experiencing (pain, discomfort, changes, etc.)")
-                    print("   💡 If you want to exit, type 'quit'")
+                    print("   Please describe what you're experiencing (pain, discomfort, changes, etc.)")
+                    print("   If you want to exit, type 'quit'")
                 elif validation_result["error_type"] == "too_short":
-                    print("   💡 Try to include more details like:")
+                    print("   Try to include more details like:")
                     print("      • Where do you feel the symptoms?")
                     print("      • How long have you had them?")
                     print("      • How severe are they (1-10 scale)?")
                 elif validation_result["error_type"] == "too_long":
-                    print("   💡 Please try to be more concise while keeping important details")
+                    print("   Please try to be more concise while keeping important details")
                 elif validation_result["error_type"] == "invalid_characters":
-                    print("   💡 Please use only letters, numbers, and basic punctuation")
+                    print("   Please use only letters, numbers, and basic punctuation")
                 elif validation_result["error_type"] == "repeated_characters":
-                    print("   💡 Please avoid excessive repetition of characters")
+                    print("   Please avoid excessive repetition of characters")
                 
                 # Track consecutive failed attempts
                 attempt_count += 1
                 if attempt_count >= max_attempts:
-                    print(f"\n⚠️  Having trouble? Here are some example symptom descriptions:")
+                    print(f"\nHaving trouble? Here are some example symptom descriptions:")
                     print("   • 'I have a severe headache that started this morning'")
                     print("   • 'Sharp chest pain when breathing, started 2 hours ago'")
                     print("   • 'Persistent cough with fever for 3 days'")
@@ -261,41 +261,36 @@ def display_result(result: Dict[str, Any]) -> None:
                                 specialist, reasoning, urgency, and optional fields
     """
     print("\n" + "="*60)
-    print("📋 CONSULTATION RESULT")
+    print("CONSULTATION RESULT")
     print("="*60)
     
     # Display primary recommendation
     specialist = result.get('specialist', 'Unknown')
-    print(f"\n🏥 RECOMMENDED SPECIALIST: {specialist}")
+    print(f"\nRECOMMENDED SPECIALIST: {specialist}")
     
-    # Display urgency with appropriate emoji
+    # Display urgency level
     urgency = result.get('urgency', 'Medium')
-    urgency_emoji = {
-        'High': '🚨',
-        'Medium': '⚠️',
-        'Low': '💡'
-    }
-    print(f"{urgency_emoji.get(urgency, '⚠️')} URGENCY LEVEL: {urgency}")
+    print(f"URGENCY LEVEL: {urgency}")
     
     # Display reasoning
     reasoning = result.get('reasoning', 'No reasoning provided')
-    print(f"\n📝 REASONING:")
+    print(f"\nREASONING:")
     print(f"   {reasoning}")
     
     # Display alternative specialist if provided
     alternative = result.get('alternative', '')
     if alternative and alternative.strip():
-        print(f"\n🔄 ALTERNATIVE SPECIALIST: {alternative}")
+        print(f"\nALTERNATIVE SPECIALIST: {alternative}")
     
     # Display additional notes if provided
     additional_notes = result.get('additional_notes', '')
     if additional_notes and additional_notes.strip():
-        print(f"\n💡 ADDITIONAL NOTES:")
+        print(f"\nADDITIONAL NOTES:")
         print(f"   {additional_notes}")
     
     # Display important disclaimer
     print(f"\n" + "-"*60)
-    print("⚠️  IMPORTANT DISCLAIMER:")
+    print("IMPORTANT DISCLAIMER:")
     print("   This recommendation is AI-generated and should not replace")
     print("   professional medical advice. Please consult with a healthcare")
     print("   professional for proper diagnosis and treatment.")
@@ -304,11 +299,11 @@ def display_result(result: Dict[str, Any]) -> None:
 
 def _show_processing_indicator() -> None:
     """
-    Display an enhanced processing indicator with animated feedback.
+    Display a processing indicator with feedback.
     
     Shows progress to keep user engaged during API processing time.
     """
-    print("\n🔄 Processing your symptoms...")
+    print("\nProcessing your symptoms...")
     print("   Analyzing symptoms and consulting medical knowledge base...")
     
     # Simple progress indicator
@@ -319,8 +314,8 @@ def _show_processing_indicator() -> None:
         print(f"\r   {indicators[i % len(indicators)]} Please wait...", end="", flush=True)
         time.sleep(0.1)
     
-    print("\r   ✅ Analysis in progress...                    ")
-    print("   📊 Generating specialist recommendation...")
+    print("\r   Analysis in progress...                    ")
+    print("   Generating specialist recommendation...")
 
 
 def _categorize_error(error: Exception) -> Dict[str, str]:
@@ -500,11 +495,11 @@ def main() -> None:
         
         # EDUCATIONAL: Initialize the LLM handler
         # This demonstrates proper LangChain initialization with error handling
-        print("🔄 Initializing AI consultation system...")
+        print("Initializing AI consultation system...")
         try:
             # Create our ConsultationLLM instance - this sets up the LangChain components
             consultation_llm = ConsultationLLM(api_key)
-            print("✅ System ready!")
+            print("System ready!")
         except Exception as e:
             print(f"\n❌ ERROR: Failed to initialize consultation system.")
             print(f"   Details: {str(e)}")
@@ -593,9 +588,9 @@ def main() -> None:
                     break
         
         # Exit message
-        print("\n👋 Thank you for using ConsentRight!")
+        print("\nThank you for using ConsentRight!")
         print("Remember: Always consult healthcare professionals for medical concerns.")
-        print("Stay healthy! 🌟")
+        print("Stay healthy!")
         
     except Exception as e:
         print(f"\n❌ CRITICAL ERROR: {str(e)}")
